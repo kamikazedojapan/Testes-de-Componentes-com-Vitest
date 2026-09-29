@@ -5,6 +5,7 @@ import { TabData } from './tabs.model';
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { DebugElement } from "@angular/core";
 import { MOCK_TABS } from '../testing/testing-data'
+import { By } from "@angular/platform-browser";
 
 // Estrutura básica dos testes
 describe('TabsComponent Test', () => {
@@ -24,4 +25,24 @@ describe('TabsComponent Test', () => {
         fixture.componentRef.setInput("tabs", mockTabs);
         fixture.detectChanges();
     })
+
+    it('Should create the tabs component', () => {
+        expect(component).toBeDefined();
+    });
+    it('Should render the correct number of tab buttons', () => {
+        const buttons = de.queryAll(By.css(".tab_link"))
+        expect(buttons.length).toBe(2);
+    });
+    it('Should apply the activate class to the selected tab', () => {
+        fixture.componentRef.setInput("acivateTab", "advanced");
+        fixture.detectChanges();
+        const button = de.query(By.css(".tab-link:last-child"));
+        expect(button.nativeElement.classList).toContain("activate");
+    });
+    it("Should emit 'activateTab' when a tab clicked", () => {
+        const button = de.query(By.css(".tab-link:last-child"));
+        button.nativeElement.click();
+        fixture.detectChanges();
+        expect(component.activeTab()).toBe("advanced")
+    });
 })
