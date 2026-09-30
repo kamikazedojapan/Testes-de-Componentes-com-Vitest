@@ -3,6 +3,7 @@ import { beforeEach, it, describe, expect, vi} from "vitest";
 import { DebugElement } from "@angular/core";
 import { ComponentFixture, TestBed} from "@angular/core/testing";
 import { Dialog } from "@angular/cdk/dialog";
+import { By } from "@angular/platform-browser";
 
 import { CoursesCardList } from "./courses-card-list";
 import { Course } from "../model/course";
@@ -28,5 +29,49 @@ describe("Testes de Integração do courses-card-list", () => { // Agrupa os tes
         fixture = TestBed.createComponent(CoursesCardList); // Cria o component dentro do ambiente de teste.
         component = fixture.componentInstance; // Obtém a instância da classe do componente.
         de = fixture.debugElement; // Obtém a representação Angular da árvore do template.
+    })
+
+    it('Exibir a lista de cursos',() => {
+        // Arrange
+        fixture.componentRef.setInput('courses', MOCK_COURSES);
+
+        // Act
+        fixture.detectChanges();
+
+        // Assert
+        const cards = de.queryAll(By.css('.course-card'));
+
+        expect(cards).toHaveLength(MOCK_COURSES.length);
+        expect(de.nativeElement.textContent).toContain("Beginner Course");
+        expect(de.nativeElement.textContent).toContain("Advanced Course");
+    });
+
+    it('Exibir uma mensagem quando não houver cursos', () => {
+        // Arrange
+        fixture.componentRef.setInput('courses', [])
+
+        // Act
+        fixture.detectChanges();
+
+        // Assert
+        const message = de.query(By.css('.no-courses'));
+        
+        expect(message.nativeElement.textContent).toContain('No courses found');
+    });
+
+    it('Abrir o dialogo ao clicar no botão "Edit"', () => {
+        // Arrange
+        const course = MOCK_COURSES
+        fixture.componentRef.setInput('courses', [courses]);
+        fixture.detectChanges();
+
+        // Act
+        de.query(By.css('edit-btn')).nativeElement.click();
+
+        // Assert
+        expect(dialogMock.open).toHaveBeenCalledWith(CoursesDialog, {
+            width: '500px',
+            data: { course },
+        })
     })
 })
